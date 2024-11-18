@@ -1,0 +1,91 @@
+<header class="bg-black text-white fixed left-0 right-0 top-0">
+  <div
+    class="mx-auto flex justify-between items-center p-4 gap-x-4 max-w-[1400px]"
+  >
+    <!-- Logo -->
+    <div class="text-md md:text-lg font-bold">
+      <a href="/" class="hover:text-gray-300">COLUMBIA UNIVERSITY COMS W4111</a>
+    </div>
+
+    <!-- Buttons -->
+    <div class="space-x-2 hidden md:block text-sm">
+      <a
+        href="/login"
+        class="px-4 py-2 border border-gray-500 rounded-md hover:bg-gray-700"
+        >Login</a
+      >
+      <a
+        href="/signup"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >Signup</a
+      >
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button id="menu-toggle" class="md:hidden text-gray-300">
+      <i class="bx bx-menu text-2xl"></i>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <nav
+    id="mobile-menu"
+    class="fixed inset-0 text-black shadow-lg hidden z-50 bg-opacity-50 bg-black"
+  >
+    <div class="absolute inset-0" id="menu-overlay"></div>
+    <div class="absolute top-0 left-0 h-36 bg-white w-full py-4 shadow-lg">
+      <div class="flex flex-col items-start justify-center h-full px-6 pb-3">
+        <button id="menu-close" class="mt-4 mb-2">
+          <i class="bx bx-x text-2xl"></i>
+        </button>
+        <a
+          href="/login"
+          class="w-full menu-link text-lg py-2 hover:text-gray-400"
+          >Login</a
+        >
+        <a
+          href="/signup"
+          class="w-full menu-link text-lg py-2 hover:text-gray-400"
+          >Signup</a
+        >
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  // Toggle mobile menu
+  document.getElementById("menu-toggle").addEventListener("click", function () {
+    const mobileMenu = document.getElementById("mobile-menu");
+    mobileMenu.classList.remove("hidden");
+  });
+
+  // Close mobile menu
+  document.getElementById("menu-close").addEventListener("click", function () {
+    const mobileMenu = document.getElementById("mobile-menu");
+    mobileMenu.classList.add("hidden");
+  });
+
+  // Close mobile menu via overlay click
+  document
+    .getElementById("menu-overlay")
+    .addEventListener("click", function () {
+      const mobileMenu = document.getElementById("mobile-menu");
+      mobileMenu.classList.add("hidden");
+    });
+
+  // Close mobile menu when clicking on a menu link
+  const menuLinks = document.querySelectorAll(".menu-link");
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      const href = this.getAttribute("href");
+      const mobileMenu = document.getElementById("mobile-menu");
+      mobileMenu.classList.add("hidden");
+
+      setTimeout(() => {
+        window.location.href = href;
+      }, 100);
+    });
+  });
+</script>
