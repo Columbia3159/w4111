@@ -8,6 +8,9 @@
     </div>
 
     <!-- Buttons -->
+
+    {% if session.get("user_email", None) == None or session.get("user_name",
+    None) == None%}
     <div class="space-x-2 hidden md:block text-sm">
       <a
         href="/login"
@@ -20,6 +23,27 @@
         >Signup</a
       >
     </div>
+    {% else %}
+    <div class="relative hidden md:block text-sm">
+      <button
+        id="user-dropdown-toggle"
+        class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 focus:outline-none"
+      >
+        Hi, {{ session.get("user_name") }}
+      </button>
+      <!-- Dropdown Menu -->
+      <div
+        id="user-dropdown"
+        class="absolute w-48 bg-white text-black rounded-md shadow-lg hidden mt-3"
+      >
+        <a
+          href="{{ url_for('auth.logout') }}"
+          class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+          >Logout</a
+        >
+      </div>
+    </div>
+    {% endif %}
 
     <!-- Mobile Menu Button -->
     <button id="menu-toggle" class="md:hidden text-gray-300">
@@ -87,5 +111,23 @@
         window.location.href = href;
       }, 100);
     });
+  });
+
+  // Toggle user dropdown
+  const userDropdownToggle = document.getElementById("user-dropdown-toggle");
+  const userDropdown = document.getElementById("user-dropdown");
+
+  userDropdownToggle.addEventListener("click", function () {
+    userDropdown.classList.toggle("hidden");
+  });
+
+  // Close dropdown if clicking outside
+  document.addEventListener("click", function (event) {
+    if (
+      !userDropdownToggle.contains(event.target) &&
+      !userDropdown.contains(event.target)
+    ) {
+      userDropdown.classList.add("hidden");
+    }
   });
 </script>

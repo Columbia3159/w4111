@@ -47,3 +47,9 @@ def signup():
     return render_template("signup.html", name=name, email=email)
 
   return render_template("signup.html")
+
+@auth_bp.route("/logout/")
+def logout():
+    session.pop("user_email", None)
+    session.pop("user_name", None)
+    return(redirect(url_for("public.index")))
