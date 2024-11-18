@@ -1,7 +1,11 @@
-{% extends 'layout.html' %}
-
-{% block content %}
+{% extends 'layout.html' %} {% block content %}
 <div class="bg-red-600 text-teal-200">
-    background is red
+  background is red
+
+  <div>
+    {% for n in data %}
+    <div>{{n}}</div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

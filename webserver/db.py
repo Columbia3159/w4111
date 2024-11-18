@@ -2,6 +2,7 @@ from flask import g
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from dotenv import load_dotenv
+import hashlib
 import os
 
 load_dotenv()
@@ -31,6 +32,19 @@ def close_db():
     print("Failed to close the database connection")
     print(e)
 
+def create_user(email, name, password):
+  password = hashlib.sha256(password.encode()).hexdigest()
+  cmd = "INSERT INTO users (email, name, password) VALUES (:email, :name, :password)"
+  result = g.conn.execute(text(cmd).params(email=email.lower(), name=name, password=password))
+  g.conn.commit() 
+  
+def authenticate(email, password):
+  hashed_password = hashlib.sha256(password.encode()).hexdigest()
+  cmd = "SELECT * FROM users WHERE email = :email AND password = :password"
+  user = g.conn.execute(text(cmd), {"email": email.lower(), "password": hashed_password}).fetchone()
+  print(user)
+  return user
+    
 def get_users():
   cursor = g.conn.execute(text("SELECT name FROM users"))
   names = []

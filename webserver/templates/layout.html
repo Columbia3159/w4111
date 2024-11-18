@@ -1,27 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fff" />
     <title>W4111</title>
-    <link href="{{url_for('static',filename='css/output.css')}}" rel="stylesheet">
-    <link href="{{url_for('static',filename='css/app.css')}}" rel="stylesheet">
-    <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet" />
-</head>
-<body class="bg-gray-100">
-    {% include "header.html" %}
+    <link
+      href="{{url_for('static',filename='css/output.css')}}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{url_for('static',filename='css/app.css')}}"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100">
+    <div class="content">
+      {% include "header.html" %} {% with messages =
+      get_flashed_messages(with_categories=true) %} {% if messages %}
+      <div class="app-message">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} ">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    <main>
-        {% block content %} {% endblock %}
-    </main>
-</body>
+      <main>{% block content %} {% endblock %}</main>
+    </div>
+  </body>
 </html>
