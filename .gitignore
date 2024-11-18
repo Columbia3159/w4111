@@ -1,3 +1,5 @@
 /path
 __pycache__
 .env
+node_modules
+webserver/node_modules
