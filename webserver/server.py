@@ -4,6 +4,7 @@ from flask import Flask, g, render_template
 from db import *
 from routes.public import public_bp
 from routes.auth import auth_bp
+from routes.api import api_bp
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -25,6 +26,7 @@ def not_authorized(error):
 # Register Blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(public_bp)
+app.register_blueprint(api_bp, url_prefix="/api")
 
 if __name__ == "__main__":
   import click
