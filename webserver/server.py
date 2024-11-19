@@ -23,6 +23,10 @@ def teardown_request(exception):
 def not_authorized(error):
   return render_template("page_401.html"), 401
 
+@app.errorhandler(404)
+def not_found(error):
+    return render_template("page_404.html"), 404
+
 # Register Blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(public_bp)

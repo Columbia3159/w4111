@@ -1,6 +1,8 @@
-{% extends "layout.html" %}
-{% block page_title %}Unauthorized(401){% endblock %}
-{% block content %}
-    {{ super() }}
+{% extends "layout.html" %} {% block page_title %}Unauthorized(401){% endblock
+%} {% block content %} {{ super() }}
+<div class="p-10">
+  <div class="p-10 bg-red-100 text-red-700 rounded-xl">
     You're not allowed to access.
+  </div>
+</div>
 {% endblock %}

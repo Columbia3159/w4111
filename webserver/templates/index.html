@@ -95,27 +95,27 @@
     players.forEach((player) => {
       const row = `
         <tr>
-            <td class="whitespace-nowrap sticky-column">
-              <a
-                href="#"
-                class="text-blue-500 flex flex-row gap-x-2 justify-start items-center px-4"
-                ><img
-                  class="rounded-full h-8 w-8 bg-gray-300 object-cover"
-                  src="${player.player_image}"
-                />${player.player_name}</a
-              >
-            </td>
-            <td>${player.espn_rank}</td>
-            <td>${player.points}</td>
-            <td>${player.assists}</td>
-            <td>${player.rebounds}</td>
-            <td>${player.steals}</td>
-            <td>${player.blocks}</td>
-            <td>${player.turn_overs}</td>
-            <td>${player.fg_percentage}</td>
-            <td>${player.fg_3p_percentage}</td>
-            <td>${player.ft_percentage}</td>
-          </tr>
+          <td class="whitespace-nowrap sticky-column">
+            <a
+              href="/player/${player.player_id}"
+              class="text-blue-500 flex flex-row gap-x-2 justify-start items-center px-4"
+              ><img
+                class="rounded-full h-8 w-8 bg-gray-300 object-cover"
+                src="${player.player_image}"
+              />${player.player_name}</a
+            >
+          </td>
+          <td>${player.espn_rank}</td>
+          <td>${player.points}</td>
+          <td>${player.assists}</td>
+          <td>${player.rebounds}</td>
+          <td>${player.steals}</td>
+          <td>${player.blocks}</td>
+          <td>${player.turn_overs}</td>
+          <td>${player.fg_percentage}</td>
+          <td>${player.fg_3p_percentage}</td>
+          <td>${player.ft_percentage}</td>
+        </tr>
       `;
       tableBody.innerHTML += row;
     });

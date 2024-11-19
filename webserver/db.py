@@ -79,6 +79,21 @@ def get_players(page=1, search_query=""):
   cursor.close()
   return players_list, 0 if len(players_list) == 0 else players_list[0]['total_count']
 
+def get_player(player_id):
+  query = text("SELECT * FROM player WHERE player_id = :player_id")
+  result = g.conn.execute(query, {"player_id": player_id})
+  player = next(result, None)
+  return player
+
+def get_player_teams(player_id):
+  query = text("SELECT * FROM team INNER JOIN team_player ON team.team_id = team_player.team_id WHERE player_id = :player_id")
+  cursor = g.conn.execute(query, {"player_id": player_id})
+  teams = []
+  for result in cursor:
+    teams.append(result)  
+  cursor.close()
+  return teams
+
 def convert_player(player):
   return {
     "player_id": player[0],

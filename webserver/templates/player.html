@@ -1,0 +1,111 @@
+{% extends 'layout.html' %} {% block content %}
+<div>
+  <div class="bg-[#006bb6] text-white">
+    <div class="container mx-auto p-8">
+      <div class="flex flex-col md:flex-row items-center gap-8 min-h-[300px]">
+        <!-- Team Logo -->
+        <div class="flex justify-center md:justify-start">
+          <img
+            class="w-[200px] h-[200px] rounded-full object-cover border"
+            src="{{player.player_image}}"
+            alt="Player"
+          />
+        </div>
+        <!-- Player Info -->
+        <div class="flex-1">
+          <p class="text-lg md:text-xl font-medium">
+            ESPN Rank | #{{player.espn_rank}}
+          </p>
+          <h1 class="text-2xl md:text-3xl font-bold">{{player.player_name}}</h1>
+        </div>
+        <!-- Follow Button -->
+        <div class="mt-4 md:mt-0">
+          <button
+            class="px-6 py-1.5 border border-white rounded-full flex items-center gap-x-2 text-sm hover:bg-white hover:text-[#006bb6] transition-colors duration-300"
+          >
+            <i class="bx bx-star text-xl"></i> COMPARE
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="bg-opacity-20 bg-black text-white border-t">
+      <div
+        class="container mx-auto flex text-center divide-x divide-y md:divide-y-0 flex-wrap md:flex-nowrap divide-white border-x"
+      >
+        <div class="px-4 py-8 flex-1">
+          <p class="text-sm">POINTS</p>
+          <p class="text-xl font-bold">{{player.points}}</p>
+        </div>
+        <div class="px-4 py-8 flex-1">
+          <p class="text-sm">ASSISTS</p>
+          <p class="text-xl font-bold">{{player.assists}}</p>
+        </div>
+        <div class="px-4 py-8 flex-1">
+          <p class="text-sm">REBOUNDS</p>
+          <p class="text-xl font-bold">{{player.rebounds}}</p>
+        </div>
+        <div class="px-4 py-8 flex-1">
+          <p class="text-sm">STEALS</p>
+          <p class="text-xl font-bold">{{player.steals}}</p>
+        </div>
+        <div class="px-4 py-8 flex-1">
+          <p class="text-sm">BLOCKS</p>
+          <p class="text-xl font-bold">{{player.blocks}}</p>
+        </div>
+        <div class="px-4 py-8 flex-1">
+          <p class="text-sm">TURN OVERS</p>
+          <p class="text-xl font-bold">{{player.turn_overs}}</p>
+        </div>
+        <div class="px-4 py-8 flex-1">
+          <p class="text-sm">FP %</p>
+          <p class="text-xl font-bold">{{player.fg_percentage}}</p>
+        </div>
+        <div class="px-4 py-8 flex-1">
+          <p class="text-sm">FP 3P %</p>
+          <p class="text-xl font-bold">{{player.fg_3p_percentage}}</p>
+        </div>
+        <div class="px-4 py-8 flex-1">
+          <p class="text-sm">FT %</p>
+          <p class="text-xl font-bold">{{player.ft_percentage}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-center py-10 px-4">
+    <div
+      class="max-w-[1280px] mx-auto bg-white rounded-xl shadow-sm p-5 text-start"
+    >
+      <div
+        class="flex justify-between items-center pb-4 mb-4 border-b border-slate-300"
+      >
+        <h1 class="text-xl font-bold">About</h1>
+      </div>
+      <p class="mt-5">{{player.description}}</p>
+    </div>
+  </div>
+  <div class="text-center px-4">
+    <div
+      class="max-w-[1280px] mx-auto bg-white rounded-xl shadow-sm p-5 text-start"
+    >
+      <div
+        class="flex justify-between items-center pb-4 mb-4 border-b border-slate-300"
+      >
+        <h1 class="text-xl font-bold">Teams</h1>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 text-center gap-6">
+        {% for team in teams %}
+        <div
+          class="flex flex-row gap-x-4 justify-start items-center px-4 border rounded-xl font-medium text-lg py-6"
+        >
+          <img
+            class="rounded-full h-12 w-12 bg-gray-300 object-cover"
+            src="{{team.team_image}}"
+          />{{team.team_name}}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+<script></script>
+{% endblock %}
