@@ -1,11 +1,140 @@
 {% extends 'layout.html' %} {% block content %}
-<div class="bg-red-600 text-teal-200">
-  background is red
-
-  <div>
-    {% for n in data %}
-    <div>{{n}}</div>
-    {% endfor %}
+<div class="text-center py-10 px-4">
+  <div class="max-w-[1280px] mx-auto bg-white rounded-md shadow-sm p-5">
+    <div
+      class="flex justify-between items-center pb-4 mb-4 border-b border-slate-300"
+    >
+      <h1 class="text-xl font-bold">NBA Top players</h1>
+    </div>
+    <div class="flex items-center gap-x-6 mb-4">
+      <div class="flex-1 text-start">
+        <input
+          id="search"
+          type="text"
+          placeholder="Search Players"
+          class="h-9 text-sm px-3 max-w-[400px] w-full"
+        />
+      </div>
+      <div class="text-sm">
+        <span id="total-rows">0</span> Rows • Page
+        <span id="current-page">1</span>
+        of
+        <span id="total-pages">1</span>
+      </div>
+      <div class="rounded-md bg-gray-200 flex">
+        <button id="prev-btn" class="w-8 h-8 disabled:opacity-30" disabled>
+          <i class="bx bx-chevron-left"></i>
+        </button>
+        <button id="next-btn" class="w-8 h-8 disabled:opacity-30" disabled>
+          <i class="bx bx-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table-auto w-full">
+        <thead class="text-xs shadow-xs">
+          <tr>
+            <th class="sticky-column-header">PLAYER</th>
+            <th>ESPN RANK</th>
+            <th>POINTS</th>
+            <th>ASSISTS</th>
+            <th>REBOUNDS</th>
+            <th>STEALS</th>
+            <th>BLOCKS</th>
+            <th>TURN OVERS</th>
+            <th>FG %</th>
+            <th>FG 3P %</th>
+            <th>FT %</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
   </div>
 </div>
+<script>
+  const apiUrl = "/api/players";
+
+  const tableBody = document.getElementById("table-body");
+  const currentPageEl = document.getElementById("current-page");
+  const totalPagesEl = document.getElementById("total-pages");
+  const totalRowsEl = document.getElementById("total-rows");
+  const prevBtn = document.getElementById("prev-btn");
+  const nextBtn = document.getElementById("next-btn");
+  const searchInput = document.getElementById("search");
+
+  let currentPage = 1;
+  let rowsPerPage = 10;
+  let totalRows = 0;
+  let searchQuery = "";
+
+  async function fetchData(page = 1) {
+    const params = new URLSearchParams({
+      page: page,
+      search: searchQuery,
+    });
+    const response = await fetch(`${apiUrl}?${params.toString()}`);
+    const data = await response.json();
+
+    totalRows = data.total_rows;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+    renderTableRows(data.players);
+
+    currentPage = page;
+    currentPageEl.textContent = currentPage;
+    totalPagesEl.textContent = totalPages;
+    totalRowsEl.textContent = totalRows;
+
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages;
+  }
+
+  function renderTableRows(players) {
+    tableBody.innerHTML = "";
+    players.forEach((player) => {
+      const row = `
+        <tr>
+            <td class="whitespace-nowrap sticky-column">
+              <a
+                href="#"
+                class="text-blue-500 flex flex-row gap-x-2 justify-start items-center px-4"
+                ><img
+                  class="rounded-full h-8 w-8 bg-gray-300 object-cover"
+                  src="${player.player_image}"
+                />${player.player_name}</a
+              >
+            </td>
+            <td>${player.espn_rank}</td>
+            <td>${player.points}</td>
+            <td>${player.assists}</td>
+            <td>${player.rebounds}</td>
+            <td>${player.steals}</td>
+            <td>${player.blocks}</td>
+            <td>${player.turn_overs}</td>
+            <td>${player.fg_percentage}</td>
+            <td>${player.fg_3p_percentage}</td>
+            <td>${player.ft_percentage}</td>
+          </tr>
+      `;
+      tableBody.innerHTML += row;
+    });
+  }
+
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) fetchData(currentPage - 1);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    if (currentPage < totalPages) fetchData(currentPage + 1);
+  });
+
+  searchInput.addEventListener("input", () => {
+    searchQuery = searchInput.value.trim();
+    fetchData(1);
+  });
+
+  fetchData(currentPage);
+</script>
 {% endblock %}

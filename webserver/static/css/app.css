@@ -74,3 +74,42 @@ input:focus {
   box-shadow: 0 0 0 2px #60a5fa;
   outline: none;
 }
+
+table thead {
+  background-color: #e5e7eb;
+}
+
+table thead tr th {
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 0.75rem 0.75rem;
+}
+
+table tbody tr td {
+  font-size: 0.85rem;
+  line-height: 1rem;
+  padding: 0.5rem 0.75rem;
+}
+
+table tbody tr {
+  border-bottom: 1px solid #ebe9e7;
+}
+
+table tbody tr:hover,
+table tbody tr:hover .sticky-column {
+  background-color: rgb(239, 246, 255);
+}
+
+.sticky-column-header {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background-color: #e5e7eb;
+}
+
+.sticky-column {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background-color: white;
+}

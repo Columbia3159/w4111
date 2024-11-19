@@ -41,7 +41,8 @@ def create_user(email, name, password):
 def authenticate(email, password):
   hashed_password = hashlib.sha256(password.encode()).hexdigest()
   cmd = "SELECT * FROM users WHERE email = :email AND password = :password"
-  user = g.conn.execute(text(cmd), {"email": email.lower(), "password": hashed_password}).fetchone()
+  result = g.conn.execute(text(cmd), {"email": email.lower(), "password": hashed_password})
+  user = next(result, None)
   return user
     
 def get_users():
@@ -51,3 +52,48 @@ def get_users():
     names.append(result)  
   cursor.close()
   return names
+
+def get_players(page=1, search_query=""):
+  rows_per_page = 10
+  offset = (page - 1) * rows_per_page
+
+  base_query = "SELECT *, COUNT(*) OVER() AS total_count FROM player"
+  where_clause = ""
+  params = {'rows_per_page': rows_per_page, 'offset': offset}
+    
+  if search_query and len(search_query) > 0:
+    where_clause = "WHERE LOWER(player_name) LIKE :search"
+    params['search'] = f"%{search_query}%"
+      
+  query = text(f"""
+    {base_query}
+    {where_clause}
+    ORDER BY player_id ASC
+    LIMIT :rows_per_page OFFSET :offset
+  """)
+
+  cursor = g.conn.execute(query, params)
+  players_list = []
+  for result in cursor:
+    players_list.append(convert_player(result))  
+  cursor.close()
+  return players_list, 0 if len(players_list) == 0 else players_list[0]['total_count']
+
+def convert_player(player):
+  return {
+    "player_id": player[0],
+    "player_name": player[1],
+    "player_image":player[2],
+    "espn_rank": player[3],
+    "description": player[4],
+    "points": player[5],
+    "assists": player[6],
+    "rebounds": player[7],
+    "steals": player[8],
+    "blocks": player[9],
+    "turn_overs": player[10],
+    "fg_percentage": player[11],
+    "fg_3p_percentage": player[12],
+    "ft_percentage": player[13],
+    "total_count": player[14],
+  }
