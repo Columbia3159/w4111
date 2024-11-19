@@ -20,8 +20,9 @@ button:focus {
 .app-message {
   padding: 0.5rem;
   position: fixed;
-  left: 0;
   right: 0;
+  max-width: 340px;
+  transition: opacity 0.5s ease;
 }
 
 .alert {
@@ -30,20 +31,22 @@ button:focus {
   padding-inline: 1.25rem;
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+  display: flex;
+  gap: 10px;
 }
 
 .alert-error {
-  background-color: rgba(153, 27, 27, 0.3);
+  background-color: rgb(254, 202, 202);
   color: rgb(153, 27, 27);
 }
 
 .alert-info {
-  background-color: rgba(30, 64, 175, 0.3);
+  background-color: rgb(191, 219, 254);
   color: rgb(30 64 175);
 }
 
 .alert-success {
-  background-color: rgba(22, 101, 52, 0.3);
+  background-color: rgb(187, 247, 208);
   color: rgb(22, 101, 52);
 }
 

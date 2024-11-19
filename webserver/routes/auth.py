@@ -1,11 +1,12 @@
 from flask import Blueprint, request, jsonify, g, render_template, flash, redirect, url_for, abort, session
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
+from app_routes import Routes
 from db import *
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/login', methods=["GET", "POST"])
+@auth_bp.route('/login', methods=Routes.AUTH_LOGIN.methods)
 def login():
   if request.method == 'POST':
     email = request.form['email']
@@ -13,43 +14,54 @@ def login():
     try:
       user = authenticate(email, password)
       if user:
-          session['user_email'] = user[0]
-          session['user_name'] = user[1]
-          return redirect(url_for('public.index'))  
+        session['user_email'] = user[0]
+        session['user_name'] = user[1]
+        return redirect(url_for(Routes.PUBLIC_HOME.route))  
       else:
-          flash('Invalid email or password. Please try again.', 'error')
+        common_error("User not found")
     except Exception as e:
       print(e)
-      flash('An unexpected error occurred. Please try again.', 'error')
+      common_error()
       
-    return render_template("login.html", email=email)
+    return render_template(Routes.AUTH_LOGIN.template, email=email)
   
-  return render_template("login.html")
+  return render_template(Routes.AUTH_LOGIN.template)
 
 
-@auth_bp.route('/signup', methods=["GET", "POST"])
+@auth_bp.route('/signup', methods=Routes.AUTH_SIGNUP.methods)
 def signup():
   if request.method == 'POST':
     try:
       name = request.form['name']
       email = request.form['email']
       password = request.form['password']
+      
       create_user(email, name, password)
-      return(redirect(url_for("auth.login")))
+      user = authenticate(email, password)
+      if user:
+        session['user_email'] = user[0]
+        session['user_name'] = user[1]
+        return(redirect(url_for(Routes.PUBLIC_HOME.route)))
+      else:
+        return(redirect(url_for(Routes.AUTH_LOGIN.route)))
+      
     except IntegrityError as e:
       if "users_pkey" in str(e) or "duplicate key value" in str(e):
-        flash('An account with this email already exists. Please log in or use a different email.', 'error')
+        common_error('An account with this email already exists. Please log in or use a different email.')
       else:
-        flash('An unexpected error occurred. Please try again.', 'error')
+        common_error()
     except Exception as e: 
-      flash('An unexpected error occurred. Please try again.', 'error')
+      common_error()
       
-    return render_template("signup.html", name=name, email=email)
+    return render_template(Routes.AUTH_SIGNUP.template, name=name, email=email)
 
-  return render_template("signup.html")
+  return render_template(Routes.AUTH_SIGNUP.template)
 
-@auth_bp.route("/logout/")
+@auth_bp.route("/logout")
 def logout():
     session.pop("user_email", None)
     session.pop("user_name", None)
-    return(redirect(url_for("public.index")))
+    return(redirect(url_for(Routes.PUBLIC_HOME.route)))
+
+def common_error(message=None):
+  flash(message or 'An unexpected error occurred. Please try again.', 'error')

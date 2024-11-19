@@ -1,0 +1,66 @@
+<nav
+  id="mobile-menu"
+  class="fixed inset-0 text-black shadow-lg hidden z-50 bg-opacity-50 bg-black"
+>
+  <div class="absolute inset-0" id="menu-overlay"></div>
+  <div class="absolute top-0 left-0 h-36 bg-white w-full py-4 shadow-lg">
+    <div class="flex flex-col items-start justify-center h-full px-6 pb-3">
+      <button id="menu-close" class="mt-4 mb-2">
+        <i class="bx bx-x text-2xl"></i>
+      </button>
+      {% if session.get("user_email", None) == None or session.get("user_name",
+      None) == None%}
+      <a href="/login" class="w-full menu-link py-2 hover:text-gray-400"
+        >Login</a
+      >
+      <a href="/signup" class="w-full menu-link py-2 hover:text-gray-400"
+        >Signup</a
+      >
+      {% else %}
+      <button class="py-2">Hi, {{ session.get("user_name") }}</button>
+      <a
+        href="{{ url_for('auth.logout') }}"
+        class="block py-2 text-sm text-red-600 hover:underline"
+        >Logout</a
+      >
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Toggle mobile menu
+  document.getElementById("menu-toggle").addEventListener("click", function () {
+    const mobileMenu = document.getElementById("mobile-menu");
+    mobileMenu.classList.remove("hidden");
+  });
+
+  // Close mobile menu
+  document.getElementById("menu-close").addEventListener("click", function () {
+    const mobileMenu = document.getElementById("mobile-menu");
+    mobileMenu.classList.add("hidden");
+  });
+
+  // Close mobile menu via overlay click
+  document
+    .getElementById("menu-overlay")
+    .addEventListener("click", function () {
+      const mobileMenu = document.getElementById("mobile-menu");
+      mobileMenu.classList.add("hidden");
+    });
+
+  // Close mobile menu when clicking on a menu link
+  const menuLinks = document.querySelectorAll(".menu-link");
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      const href = this.getAttribute("href");
+      const mobileMenu = document.getElementById("mobile-menu");
+      mobileMenu.classList.add("hidden");
+
+      setTimeout(() => {
+        window.location.href = href;
+      }, 100);
+    });
+  });
+</script>

@@ -14,7 +14,7 @@ DB_NAME = os.getenv("DB_NAME")
 
 DATABASEURI = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_SERVER}/{DB_NAME}"
 
-engine = create_engine(DATABASEURI)
+engine = create_engine(DATABASEURI, pool_size=10, max_overflow=20, pool_timeout=30, pool_recycle=1800)
 
 def connect_db():
   try:
@@ -42,7 +42,6 @@ def authenticate(email, password):
   hashed_password = hashlib.sha256(password.encode()).hexdigest()
   cmd = "SELECT * FROM users WHERE email = :email AND password = :password"
   user = g.conn.execute(text(cmd), {"email": email.lower(), "password": hashed_password}).fetchone()
-  print(user)
   return user
     
 def get_users():

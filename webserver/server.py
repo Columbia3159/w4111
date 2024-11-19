@@ -18,16 +18,13 @@ def before_request():
 def teardown_request(exception):
   close_db()
 
-
 @app.errorhandler(401)
 def not_authorized(error):
   return render_template("page_401.html"), 401
 
-
 # Register Blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(public_bp)
-
 
 if __name__ == "__main__":
   import click

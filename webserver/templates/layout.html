@@ -20,11 +20,16 @@
   </head>
   <body class="bg-gray-100">
     <div class="content">
-      {% include "header.html" %} {% with messages =
+      {% include "components/header.html" %} {% with messages =
       get_flashed_messages(with_categories=true) %} {% if messages %}
       <div class="app-message">
         {% for category, message in messages %}
-        <div class="alert alert-{{ category }} ">{{ message }}</div>
+        <div class="alert alert-{{ category }}">
+          {{ message }}
+          <button class="alert-close">
+            <i class="bx bx-x text-2xl"></i>
+          </button>
+        </div>
         {% endfor %}
       </div>
       {% endif %} {% endwith %}
@@ -32,4 +37,27 @@
       <main>{% block content %} {% endblock %}</main>
     </div>
   </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      //hide alert after 5 sec
+      const appMessage = document.querySelector(".app-message");
+      if (appMessage) {
+        setTimeout(() => {
+          appMessage.style.opacity = "0";
+          setTimeout(() => {
+            appMessage.style.display = "none";
+          }, 500);
+        }, 5000);
+      }
+      //hide alert on click button
+      const closeButtons = document.querySelectorAll(".alert-close");
+      closeButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+          const alert = this.closest(".alert");
+          alert.style.opacity = "0";
+          alert.style.display = "none";
+        });
+      });
+    });
+  </script>
 </html>
