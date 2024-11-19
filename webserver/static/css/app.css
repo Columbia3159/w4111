@@ -117,3 +117,8 @@ table tbody tr:hover .sticky-column {
   z-index: 10;
   background-color: white;
 }
+
+.active-tab {
+  background-color: black;
+  color: white;
+}

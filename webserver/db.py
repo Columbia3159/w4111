@@ -86,8 +86,24 @@ def get_player(player_id):
   return player
 
 def get_player_teams(player_id):
-  query = text("SELECT * FROM team INNER JOIN team_player ON team.team_id = team_player.team_id WHERE player_id = :player_id")
+  query = text("""SELECT * FROM team 
+    INNER JOIN team_player ON team.team_id = team_player.team_id 
+    WHERE player_id = :player_id
+  """)
   cursor = g.conn.execute(query, {"player_id": player_id})
+  teams = []
+  for result in cursor:
+    teams.append(result)  
+  cursor.close()
+  return teams
+
+def get_team_players():
+  query = text("""
+    SELECT team.*, player.player_id, player_name, player_image, espn_rank 
+    FROM team INNER JOIN team_player ON team.team_id = team_player.team_id 
+              INNER JOIN player ON team_player.player_id = player.player_id
+  """)
+  cursor = g.conn.execute(query)
   teams = []
   for result in cursor:
     teams.append(result)  

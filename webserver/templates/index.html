@@ -1,140 +1,95 @@
 {% extends 'layout.html' %} {% block content %}
 <div class="text-center py-10 px-4">
-  <div class="max-w-[1280px] mx-auto bg-white rounded-md shadow-sm p-5">
+  <div
+    class="max-w-[1280px] mx-auto bg-white rounded-xl shadow-sm p-5 text-start"
+  >
     <div
       class="flex justify-between items-center pb-4 mb-4 border-b border-slate-300"
     >
-      <h1 class="text-xl font-bold">NBA Top players</h1>
-    </div>
-    <div class="flex items-center gap-x-6 mb-4">
-      <div class="flex-1 text-start">
-        <input
-          id="search"
-          type="text"
-          placeholder="Search Players"
-          class="h-9 text-sm px-3 max-w-[400px] w-full"
-        />
-      </div>
-      <div class="text-sm">
-        <span id="total-rows">0</span> Rows • Page
-        <span id="current-page">1</span>
-        of
-        <span id="total-pages">1</span>
-      </div>
-      <div class="rounded-md bg-gray-200 flex">
-        <button id="prev-btn" class="w-8 h-8 disabled:opacity-30" disabled>
-          <i class="bx bx-chevron-left"></i>
+      <h1 class="text-xl font-bold">NBA</h1>
+      <div class="flex gap-x-4">
+        <button
+          id="players-tab"
+          class="h-10 w-24 rounded-md border border-black active-tab font-semibold focus:outline-none"
+        >
+          Players
         </button>
-        <button id="next-btn" class="w-8 h-8 disabled:opacity-30" disabled>
-          <i class="bx bx-chevron-right"></i>
+        <button
+          id="teams-tab"
+          class="h-10 w-24 rounded-md border border-black font-semibold focus:outline-none"
+        >
+          Teams
         </button>
       </div>
     </div>
-    <div class="overflow-x-auto">
-      <table class="table-auto w-full">
-        <thead class="text-xs shadow-xs">
-          <tr>
-            <th class="sticky-column-header">PLAYER</th>
-            <th>ESPN RANK</th>
-            <th>POINTS</th>
-            <th>ASSISTS</th>
-            <th>REBOUNDS</th>
-            <th>STEALS</th>
-            <th>BLOCKS</th>
-            <th>TURN OVERS</th>
-            <th>FG %</th>
-            <th>FG 3P %</th>
-            <th>FT %</th>
-          </tr>
-        </thead>
-        <tbody id="table-body"></tbody>
-      </table>
+
+    <div id="teams-section" class="hidden">
+      <div class="flex flex-col text-start gap-6">
+        {% for team_id, team_data in teams.items() %}
+        <div class="border rounded-xl font-medium text-lg py-6 px-4">
+          <div class="flex flex-row gap-x-4 justify-start items-center">
+            <img
+              class="rounded-full h-12 w-12 bg-gray-300 object-cover"
+              src="{{team_data.team_image}}"
+            />{{team_data.team_name}}
+          </div>
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4"
+          >
+            {% for player in team_data.players %}
+            <a
+              href="/player/{{ player.player_id }}"
+              class="bg-gray-100 p-4 flex flex-row items-center justify-start gap-x-4 rounded-lg shadow hover:shadow-md cursor-pointer"
+            >
+              <img
+                class="w-12 h-12 object-cover rounded-full"
+                src="{{ player.player_image }}"
+                alt="{{ player.player_name }}"
+              />
+              <div class="flex flex-col items-start">
+                <p class="text-sm leading-none font-semibold text-center">
+                  {{ player.player_name }}
+                </p>
+                <p class="text-xs text-gray-600 mt-1 font-normal text-center">
+                  ESPN Rank: {{ player.espn_rank }}
+                </p>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
+
+    {% include "player_table.html" %}
   </div>
 </div>
+
 <script>
-  const apiUrl = "/api/players";
+  const teamsTab = document.getElementById("teams-tab");
+  const playersTab = document.getElementById("players-tab");
+  const teamsSection = document.getElementById("teams-section");
+  const playersSection = document.getElementById("players-section");
 
-  const tableBody = document.getElementById("table-body");
-  const currentPageEl = document.getElementById("current-page");
-  const totalPagesEl = document.getElementById("total-pages");
-  const totalRowsEl = document.getElementById("total-rows");
-  const prevBtn = document.getElementById("prev-btn");
-  const nextBtn = document.getElementById("next-btn");
-  const searchInput = document.getElementById("search");
+  function switchTab(selectedTab, otherTab, selectedSection, otherSection) {
+    selectedTab.classList.add("active-tab");
+    otherTab.classList.remove("active-tab");
 
-  let currentPage = 1;
-  let rowsPerPage = 10;
-  let totalRows = 0;
-  let searchQuery = "";
+    selectedSection.classList.remove("hidden");
+    selectedSection.classList.add("block");
 
-  async function fetchData(page = 1) {
-    const params = new URLSearchParams({
-      page: page,
-      search: searchQuery,
-    });
-    const response = await fetch(`${apiUrl}?${params.toString()}`);
-    const data = await response.json();
-
-    totalRows = data.total_rows;
-    const totalPages = Math.ceil(totalRows / rowsPerPage);
-
-    renderTableRows(data.players);
-
-    currentPage = page;
-    currentPageEl.textContent = currentPage;
-    totalPagesEl.textContent = totalPages;
-    totalRowsEl.textContent = totalRows;
-
-    prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage === totalPages;
+    otherSection.classList.remove("block");
+    otherSection.classList.add("hidden");
   }
-
-  function renderTableRows(players) {
-    tableBody.innerHTML = "";
-    players.forEach((player) => {
-      const row = `
-        <tr>
-          <td class="whitespace-nowrap sticky-column">
-            <a
-              href="/player/${player.player_id}"
-              class="text-blue-500 flex flex-row gap-x-2 justify-start items-center px-4"
-              ><img
-                class="rounded-full h-8 w-8 bg-gray-300 object-cover"
-                src="${player.player_image}"
-              />${player.player_name}</a
-            >
-          </td>
-          <td>${player.espn_rank}</td>
-          <td>${player.points}</td>
-          <td>${player.assists}</td>
-          <td>${player.rebounds}</td>
-          <td>${player.steals}</td>
-          <td>${player.blocks}</td>
-          <td>${player.turn_overs}</td>
-          <td>${player.fg_percentage}</td>
-          <td>${player.fg_3p_percentage}</td>
-          <td>${player.ft_percentage}</td>
-        </tr>
-      `;
-      tableBody.innerHTML += row;
-    });
-  }
-
-  prevBtn.addEventListener("click", () => {
-    if (currentPage > 1) fetchData(currentPage - 1);
+  teamsTab.addEventListener("click", () => {
+    switchTab(teamsTab, playersTab, teamsSection, playersSection);
   });
 
-  nextBtn.addEventListener("click", () => {
-    const totalPages = Math.ceil(totalRows / rowsPerPage);
-    if (currentPage < totalPages) fetchData(currentPage + 1);
+  playersTab.addEventListener("click", () => {
+    switchTab(playersTab, teamsTab, playersSection, teamsSection);
   });
 
-  searchInput.addEventListener("input", () => {
-    searchQuery = searchInput.value.trim();
-    fetchData(1);
-  });
-
-  fetchData(currentPage);
+  switchTab(playersTab, teamsTab, playersSection, teamsSection);
 </script>
 {% endblock %}
