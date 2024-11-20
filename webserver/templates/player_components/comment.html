@@ -12,6 +12,7 @@
     <form
       class="mb-6"
       id="comment-form"
+      method="POST"
       data-player-id="{{ player.player_id }}"
     >
       <textarea
@@ -125,6 +126,7 @@
 
         const result = await response.json();
         if (response.ok) {
+          window.location.href = this.action;
           location.reload();
         } else {
           alert(result.error || "Failed to save comment");
