@@ -61,12 +61,5 @@ def logout():
   session.pop("user_name", None)
   return(redirect(url_for(Routes.PUBLIC_HOME.route)))
 
-@auth_bp.route('/rating', methods=Routes.USER_RATINGS.methods)
-def rating():
-  if "user_email" in session.keys() and "user_name" in session.keys():
-    return render_template(Routes.USER_RATINGS.template)
-  else:
-      return abort(401)
-
 def common_error(message=None):
   flash(message or 'An unexpected error occurred. Please try again.', 'error')

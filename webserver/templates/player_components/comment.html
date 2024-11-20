@@ -8,7 +8,7 @@
       <h1 class="text-xl font-bold">Comments</h1>
     </div>
     <!-- Comment Form -->
-    {% if not session.get('user_email') %}
+    {% if session.get('user_email') %}
     <form
       class="mb-6"
       id="comment-form"

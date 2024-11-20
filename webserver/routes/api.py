@@ -56,7 +56,7 @@ def submit_comment():
     data = request.get_json()
     player_id = data.get('player_id')
     comment = data.get('comment') 
-    user = "khaliun0122@gmail.com"#session.get("user_email", None)
+    user = session.get("user_email", None)
     
     if user is None:
       return {"error": "User not logged in"}, 401
@@ -70,7 +70,7 @@ def submit_comment():
   
 @api_bp.route('/comment/like/<int:comment_id>', methods=['POST'])
 def like_comment(comment_id):
-  user_email = "khaliun0122@gmail.com"#session.get("user_email", None)
+  user_email = session.get("user_email", None)
   if not user_email:
     return {"error": "User not logged in."}, 401
   try:
@@ -82,7 +82,7 @@ def like_comment(comment_id):
 
 @api_bp.route('/comment/dislike/<int:comment_id>', methods=['POST'])
 def dislike_comment(comment_id):
-  user_email = "khaliun0122@gmail.com"#session.get("user_email", None)
+  user_email = session.get("user_email", None)
   if not user_email:
     return {"error": "User not logged in."}, 401
   try:
@@ -98,7 +98,7 @@ def add_reply():
   parent_id = data.get('parent_id')
   player_id = data.get('player_id')
   reply_text = data.get('reply')
-  user_email = "khaliun0122@gmail.com"#session.get("user_email", None)
+  user_email = session.get("user_email", None)
 
   if not parent_id or not reply_text or not user_email:
     return {"error": "Invalid input."}, 400
