@@ -188,7 +188,7 @@ def get_comments(player_id):
     FROM comment c
     LEFT JOIN user_comment_like ucl ON c.comment_id = ucl.comment_id
     LEFT JOIN reply r ON c.comment_id = r.child_id
-    WHERE c.player_id = 21
+    WHERE c.player_id = :player_id
     GROUP BY c.comment_id, r.parent_id
     ORDER BY c.date DESC
   """)

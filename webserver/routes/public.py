@@ -55,7 +55,7 @@ def player(player_id):
   else:
       overall_rating = 0 
       
-  comments = get_player_comments(player)
+  comments = get_player_comments(player_id)
       
   return render_template(
     Routes.PUBLIC_PLAYER_DETAIL.template, 
