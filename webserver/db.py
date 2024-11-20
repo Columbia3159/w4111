@@ -110,6 +110,57 @@ def get_team_players():
   cursor.close()
   return teams
 
+def get_rating_categories():
+  query = text("SELECT * FROM rating_category")
+  cursor = g.conn.execute(query)
+  categories = []
+  for result in cursor:
+    categories.append(result)  
+  cursor.close()
+  return categories
+
+def get_player_avg_rating(player_id):
+  ratings_query = text("""
+    SELECT category_id, ROUND(AVG(score), 1) AS average_rating
+    FROM user_rating
+    WHERE player_id = :player_id
+    GROUP BY category_id
+  """)
+  ratings = g.conn.execute(ratings_query, {"player_id": player_id}).fetchall()
+  average_ratings = {row[0]: row[1] for row in ratings}
+  return average_ratings
+
+def save_category_score(user, player_id, category_id, value):
+  insert_query = text("""
+    INSERT INTO user_rating (email, player_id, category_id, score)
+    VALUES (:email, :player_id, :category_id, :rating_value)
+    ON CONFLICT (email, player_id, category_id)
+    DO UPDATE SET score = EXCLUDED.score
+  """)
+  g.conn.execute(insert_query, {
+    "email": user,
+    "player_id": player_id,
+    "category_id": int(category_id),
+    "rating_value": int(value)
+  })
+  
+def delete_score(email, player_id):
+  delete_query = text("""
+    DELETE FROM user_rating
+    WHERE player_id = :player_id AND email = :email
+  """)
+  g.conn.execute(delete_query, {"player_id": player_id, "email": email})
+  g.conn.commit()
+  
+def get_user_rating(email, player_id):
+  user_ratings_query = text("""
+    SELECT category_id, score
+    FROM user_rating
+    WHERE player_id = :player_id AND email = :email
+  """)
+  user_ratings = g.conn.execute(user_ratings_query, {"player_id": player_id, "email": email}).fetchall()
+  return user_ratings
+  
 def convert_player(player):
   return {
     "player_id": player[0],

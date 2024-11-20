@@ -63,6 +63,16 @@ header {
   color: white;
 }
 
+.btn-primary-red {
+  background: rgb(220, 38, 38);
+  border-radius: 100px;
+  font-weight: 700;
+  transition: transform 0.2s;
+  padding: 12px 24px;
+  color: white;
+}
+
+.btn-primary-red:hover,
 .btn-primary:hover {
   transform: scale(1.03);
 }

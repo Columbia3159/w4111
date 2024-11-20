@@ -1,0 +1,123 @@
+<div class="text-center px-4">
+  <div
+    class="max-w-[1000px] mx-auto bg-white rounded-xl shadow-sm p-5 text-start"
+  >
+    <div
+      class="flex justify-between items-center pb-4 mb-4 border-b border-slate-300"
+    >
+      <h1 class="text-xl font-bold">Rate {{ player.player_name }}</h1>
+    </div>
+    <form
+      id="rating-form"
+      class="grid grid-cols-1 md:grid-cols-2 gap-x-8"
+      data-player-id="{{ player.player_id }}"
+    >
+      {% for category in categories %}
+      <div class="mb-4 flex justify-between">
+        <label
+          for="category-{{ category.category_id }}"
+          class="block font-semibold text-gray-700"
+        >
+          {{ category.category_name }}
+        </label>
+        <select
+          id="category-{{ category.category_id }}"
+          name="{{ category.category_id }}"
+          class="block min-w-48 max-w-sm border py-1 px-2 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
+        >
+          <option value="1" {% if category.user_rating == 1 %}selected{% endif %}>1 - Poor</option>
+          <option value="2" {% if category.user_rating == 2 %}selected{% endif %}>2 - Fair</option>
+          <option value="3" {% if category.user_rating == 3 %}selected{% endif %}>3 - Good</option>
+          <option value="4" {% if category.user_rating == 4 %}selected{% endif %}>4 - Very Good</option>
+          <option value="5" {% if category.user_rating == 5 %}selected{% endif %}>5 - Excellent</option>
+        </select>
+      </div>
+      {% endfor %}
+
+      <div class="flex items-center gap-x-4 mt-6">
+        <button type="button" id="submit-rating" class="btn-primary w-40">
+          Submit
+        </button>
+        {% if has_user_ratings %}
+        <button
+          type="button"
+          id="delete-rating"
+          class="btn-primary-red w-40"
+        >
+          Delete
+        </button>
+        {% endif %}
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  document
+    .getElementById("submit-rating")
+    .addEventListener("click", async () => {
+      const form = document.getElementById("rating-form");
+      const playerId = form.getAttribute("data-player-id");
+      const formData = new FormData(form);
+      const ratings = {};
+
+      formData.forEach((value, key) => {
+        ratings[key] = value;
+      });
+
+      const payload = {
+        player_id: playerId,
+        ratings: ratings,
+      };
+
+      try {
+        const response = await fetch("/api/rating", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+        console.log(result);
+        if (response.ok) {
+          alert(result.message);
+          location.reload();
+        } else {
+          alert(result.error || "Failed to save ratings");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("An unexpected error occurred");
+      }
+    });
+  
+  document.getElementById('delete-rating')?.addEventListener('click', async () => {
+    const form = document.getElementById("rating-form");
+    const playerId = form.getAttribute("data-player-id");
+    const userConfirmed = confirm("Are you sure you want to delete your ratings?");
+    if (!userConfirmed) return;
+
+    try {
+      const response = await fetch(`/api/rating/${playerId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert(result.message); 
+        location.reload();
+      } else {
+        alert(result.error || 'Failed to delete ratings');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An unexpected error occurred');
+    }
+  });
+</script>
