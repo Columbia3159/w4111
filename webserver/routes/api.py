@@ -7,12 +7,13 @@ api_bp = Blueprint('api', __name__)
 @api_bp.route('/players', methods=['GET'])
 def player_list():
   page = int(request.args.get('page', 1))  
+  rows_per_page = int(request.args.get('rows_per_page', 10))  
   search_query = request.args.get('search', '').strip().lower()
-  players_list, total_rows = get_players(page, search_query)
+  players_list, total_rows = get_players(page, rows_per_page, search_query)
   return jsonify({
     "players": players_list,
     "total_rows": total_rows,
-    "rows_per_page": 10,
+    "rows_per_page": rows_per_page,
     "current_page": page
   })
   
@@ -112,3 +113,20 @@ def add_reply():
   except Exception as e:
     print(e)
     return {"error": "An error occurred while adding the reply."}, 500
+
+@api_bp.route('/player/<int:player_id>', methods=['GET'])
+def get_player(player_id):
+  categories = get_rating_categories()
+  results = get_player_avg_rating_detail(player_id)
+  
+  if not results:
+    return {"error": "Player not found"}, 404
+
+  player_data = {
+    "player_id": results[0][0],
+    "player_name": results[0][1],
+    "ratings": {row[3]: row[4] for row in results},
+    "categories": dict(categories)
+  }
+  
+  return player_data

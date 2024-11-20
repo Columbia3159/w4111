@@ -66,6 +66,13 @@ def player(player_id):
     has_user_ratings=(len(user_rating_dict) > 0),
     comments=comments
   )
+  
+@public_bp.route('/compare/<int:player_id>')
+def compare(player_id):
+  return render_template(
+    Routes.PUBLIC_PLAYER_COMPARE.template, 
+    player1_id=player_id,
+  )
 
 def get_player_comments(player_id):
   comments_with_replies = get_comments(player_id)

@@ -53,8 +53,7 @@ def get_users():
   cursor.close()
   return names
 
-def get_players(page=1, search_query=""):
-  rows_per_page = 10
+def get_players(page=1, rows_per_page=10, search_query=""):
   offset = (page - 1) * rows_per_page
 
   base_query = "SELECT *, COUNT(*) OVER() AS total_count FROM player"
@@ -118,6 +117,24 @@ def get_rating_categories():
     categories.append(result)  
   cursor.close()
   return categories
+
+def get_player_avg_rating_detail(player_id):
+  query = text("""
+    SELECT 
+      player.player_id, 
+      player.player_name, 
+      rating_category.category_id, 
+      category_name, 
+      ROUND(AVG(score), 1) AS average_rating
+    FROM player
+    LEFT JOIN user_rating ON player.player_id = user_rating.player_id
+    LEFT JOIN rating_category ON user_rating.category_id = rating_category.category_id
+    WHERE player.player_id = :player_id
+    GROUP BY player.player_id, player.player_name, rating_category.category_id, category_name
+  """)
+  results = g.conn.execute(query, {"player_id": player_id}).fetchall()
+  return results
+
 
 def get_player_avg_rating(player_id):
   ratings_query = text("""
