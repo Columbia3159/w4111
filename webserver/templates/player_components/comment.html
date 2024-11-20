@@ -10,9 +10,9 @@
     <!-- Comment Form -->
     {% if session.get('user_email') %}
     <form
+      method="POST"
       class="mb-6"
       id="comment-form"
-      method="POST"
       data-player-id="{{ player.player_id }}"
     >
       <textarea
@@ -22,7 +22,7 @@
         class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
         required
       ></textarea>
-      <button type="submit" id="submit-comment" class="mt-2 btn-primary">
+      <button type="button" id="submit-comment" class="mt-2 btn-primary">
         Post Comment
       </button>
     </form>
@@ -126,7 +126,6 @@
 
         const result = await response.json();
         if (response.ok) {
-          window.location.href = this.action;
           location.reload();
         } else {
           alert(result.error || "Failed to save comment");
