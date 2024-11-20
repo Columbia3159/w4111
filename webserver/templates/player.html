@@ -73,7 +73,11 @@
     </div>
   </div>
 
-  {% include "player_components/average.html" %} {% include
-  "player_components/rate.html" %} {% include "player_components/teams.html" %}
+  <div class="flex flex-col gap-10 mt-10 pb-10">
+    {% include "player_components/teams.html" %} {% include
+    "player_components/average.html" %} {% if session.get("user_email", None) !=
+    None and session.get("user_name", None) != None%} {% include
+    "player_components/rate.html" %} {% endif %}
+  </div>
 </div>
 {% endblock %}

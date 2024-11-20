@@ -23,7 +23,7 @@ def submit_rating():
     data = request.get_json()
     player_id = data.get('player_id')
     ratings = data.get('ratings') 
-    user = "khaliun0122@gmail.com"#session.get("user_email", None)
+    user = session.get("user_email", None)
     
     if user is None:
       return {"error": "User not logged in"}, 401
@@ -42,7 +42,7 @@ def submit_rating():
 @api_bp.route('/rating/<int:player_id>', methods=['DELETE'])
 def delete_rating(player_id):
   try:
-    user = "khaliun0122@gmail.com"#session.get("user_email", None)
+    user = session.get("user_email", None)
     if not user:
         return {"error": "User not logged in"}, 401
     delete_score(user, player_id)

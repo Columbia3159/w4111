@@ -35,7 +35,7 @@ def player(player_id):
   categories = get_rating_categories()
   average_ratings = get_player_avg_rating(player_id)
   
-  user_email = "khaliun0122@gmail.com"#session.get("user_email", None)
+  user_email = session.get("user_email", None)
   user_rating_dict = {}
   if user_email is not None:
     user_rating = get_user_rating(user_email, player_id)
