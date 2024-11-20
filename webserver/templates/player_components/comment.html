@@ -1,0 +1,231 @@
+<div class="text-center px-4">
+  <div
+    class="max-w-[1000px] mx-auto bg-white rounded-xl shadow-sm p-5 text-start"
+  >
+    <div
+      class="flex justify-between items-center pb-4 mb-4 border-b border-slate-300"
+    >
+      <h1 class="text-xl font-bold">Comments</h1>
+    </div>
+    <!-- Comment Form -->
+    {% if not session.get('user_email') %}
+    <form
+      class="mb-6"
+      id="comment-form"
+      data-player-id="{{ player.player_id }}"
+    >
+      <textarea
+        name="comment"
+        rows="3"
+        placeholder="Write your comment..."
+        class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+        required
+      ></textarea>
+      <button type="submit" id="submit-comment" class="mt-2 btn-primary">
+        Post Comment
+      </button>
+    </form>
+    {% else %}
+    <p class="text-gray-600">You need to log in to post a comment.</p>
+    {% endif %}
+    <!-- Comments List -->
+    <div class="comments-list">
+      {% for comment in comments %}
+      <div class="comment border-b pb-4 mb-4">
+        <div class="flex items-center justify-between">
+          <span class="font-semibold text-gray-800">{{ comment.email }}</span>
+          <span class="text-sm text-gray-500"
+            >{{ comment.date.strftime('%Y-%m-%d %H:%M:%S') }}</span
+          >
+        </div>
+        <p class="mt-2 text-gray-700">{{ comment.text }}</p>
+        <div class="mt-4 flex flex-wrap items-center gap-x-4 text-xs">
+          <button
+            data-comment-id="{{ comment.id }}"
+            class="like-btn bg-green-100 text-green-700 px-3 py-1 rounded-md hover:bg-green-200"
+          >
+            👍 Like {{ comment.likes }}
+          </button>
+          <button
+            data-comment-id="{{ comment.id }}"
+            class="dislike-btn bg-red-100 text-red-700 px-3 py-1 rounded-md hover:bg-red-200"
+          >
+            👎 Dislike {{ comment.dislikes }}
+          </button>
+          <button
+            data-comment-id="{{ comment.id }}"
+            class="reply-btn bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200"
+          >
+            💬 Reply
+          </button>
+        </div>
+
+        <!-- Nested Replies -->
+        <div class="nested-replies mt-4">
+          {% for reply in comment.replies %}
+          <div class="nested-reply border-t ml-20 py-2">
+            <div class="flex items-center justify-between">
+              <span class="font-semibold text-gray-600 text-sm"
+                >{{ reply.email }}</span
+              >
+              <span class="text-sm text-gray-500"
+                >{{ reply.date.strftime('%Y-%m-%d %H:%M:%S') }}</span
+              >
+            </div>
+            <p class="mt-1 text-gray-600">{{ reply.text }}</p>
+            <div class="mt-2 flex flex-wrap items-center gap-x-4 text-xs">
+              <button
+                data-comment-id="{{ reply.id }}"
+                class="like-btn bg-green-100 text-green-700 px-3 py-1 rounded-md hover:bg-green-200"
+              >
+                👍 Like {{ reply.likes }}
+              </button>
+              <button
+                data-comment-id="{{ reply.id }}"
+                class="dislike-btn bg-red-100 text-red-700 px-3 py-1 rounded-md hover:bg-red-200"
+              >
+                👎 Dislike {{ reply.dislikes }}
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  document
+    .getElementById("submit-comment")
+    .addEventListener("click", async () => {
+      const form = document.getElementById("comment-form");
+      const playerId = form.getAttribute("data-player-id");
+      const comment = document.querySelector("textarea[name='comment']").value;
+
+      if (!comment.trim()) {
+        alert("Comment cannot be empty!");
+        return;
+      }
+
+      const payload = {
+        player_id: playerId,
+        comment: comment,
+      };
+
+      try {
+        const response = await fetch("/api/comment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          location.reload();
+        } else {
+          alert(result.error || "Failed to save comment");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("An unexpected error occurred");
+      }
+    });
+
+  document.querySelectorAll(".like-btn").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const commentId = button.getAttribute("data-comment-id");
+
+      try {
+        const response = await fetch(`/api/comment/like/${commentId}`, {
+          method: "POST",
+        });
+        const result = await response.json();
+        if (response.ok) {
+          location.reload();
+          // button.textContent = `👍 Like ${result.likes}`;
+        } else {
+          alert(result.error || "Failed to like the comment.");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("An error occurred.");
+      }
+    });
+  });
+
+  document.querySelectorAll(".dislike-btn").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const commentId = button.getAttribute("data-comment-id");
+
+      try {
+        const response = await fetch(`/api/comment/dislike/${commentId}`, {
+          method: "POST",
+        });
+        const result = await response.json();
+        if (response.ok) {
+          location.reload();
+          // button.textContent = `👎 Dislike ${result.dislikes}`;
+        } else {
+          alert(result.error || "Failed to dislike the comment.");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("An error occurred.");
+      }
+    });
+  });
+
+  document.querySelectorAll(".reply-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      const form = document.getElementById("comment-form");
+      const playerId = form.getAttribute("data-player-id");
+      const commentId = button.getAttribute("data-comment-id");
+      const replyForm = document.createElement("div");
+      replyForm.className = "w-full pl-20";
+      replyForm.innerHTML = `
+        <textarea
+          class="w-full mt-2 p-2 border rounded-md"
+          placeholder="Write your reply..."
+        ></textarea>
+        <button
+          class="submit-reply btn-primary"
+        >
+          Submit Reply
+        </button>
+      `;
+      button.parentElement.appendChild(replyForm);
+
+      replyForm
+        .querySelector(".submit-reply")
+        .addEventListener("click", async () => {
+          const replyText = replyForm.querySelector("textarea").value;
+
+          try {
+            const response = await fetch("/api/comment/reply", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                parent_id: commentId,
+                reply: replyText,
+                player_id: playerId,
+              }),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+              location.reload();
+            } else {
+              alert(result.error || "Failed to add reply.");
+            }
+          } catch (error) {
+            console.error(error);
+            alert("An error occurred.");
+          }
+        });
+    });
+  });
+</script>

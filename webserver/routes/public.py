@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify, g, render_template, abort, session
-from sqlalchemy import text
 from app_routes import Routes
 from db import *
 
@@ -56,11 +55,43 @@ def player(player_id):
   else:
       overall_rating = 0 
       
+  comments = get_player_comments(player)
+      
   return render_template(
     Routes.PUBLIC_PLAYER_DETAIL.template, 
     player=player, 
     teams=player_teams, 
     categories=categories_with_ratings,
     overall_rating=overall_rating,
-    has_user_ratings=(len(user_rating_dict) > 0)
+    has_user_ratings=(len(user_rating_dict) > 0),
+    comments=comments
   )
+
+def get_player_comments(player_id):
+  comments_with_replies = get_comments(player_id)
+  comments = {}
+  
+  for row in comments_with_replies:
+    comment = {
+      "id": row[0],
+      "email": row[1],
+      "text": row[2],
+      "date": row[3],
+      "likes": row[5],
+      "dislikes": row[6],
+      "replies": []
+    }
+    comments[row[0]] = comment
+    
+  organized_comments = [] 
+  for row in comments_with_replies:
+    parent_id = row[4]
+    if parent_id is None: 
+      organized_comments.append(comments[row[0]])
+    else: 
+      parent = comments.get(parent_id)
+      if parent:
+        parent["replies"].append(comments[row[0]])
+      else:
+        print(f"Warning: Parent comment ID {parent_id} not found for reply ID {row[0]}")
+  return organized_comments

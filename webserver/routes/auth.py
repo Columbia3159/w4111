@@ -1,6 +1,4 @@
 from flask import Blueprint, request, jsonify, g, render_template, flash, redirect, url_for, abort, session
-from sqlalchemy import text
-from sqlalchemy.exc import IntegrityError
 from app_routes import Routes
 from db import *
 

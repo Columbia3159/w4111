@@ -179,3 +179,60 @@ def convert_player(player):
     "ft_percentage": player[13],
     "total_count": player[14],
   }
+  
+def get_comments(player_id):
+  comments_query = text("""
+    SELECT c.comment_id, c.email, c.text, c.date, r.parent_id,
+      SUM(CASE WHEN ucl.isLike THEN 1 ELSE 0 END) AS likes,
+      SUM(CASE WHEN NOT ucl.isLike THEN 1 ELSE 0 END) AS dislikes
+    FROM comment c
+    LEFT JOIN user_comment_like ucl ON c.comment_id = ucl.comment_id
+    LEFT JOIN reply r ON c.comment_id = r.child_id
+    WHERE c.player_id = 21
+    GROUP BY c.comment_id, r.parent_id
+    ORDER BY c.date DESC
+  """)
+  comments = g.conn.execute(comments_query, {"player_id": player_id}).fetchall()
+  return comments
+
+def save_comment(player_id, user_email, comment):
+  insert_comment_query = text("""
+    INSERT INTO comment (player_id, email, text)
+    VALUES (:player_id, :email, :text)
+    RETURNING comment_id
+  """)
+  result = g.conn.execute(insert_comment_query, {
+    "player_id": player_id,
+    "email": user_email,
+    "text": comment
+  })
+  new_comment_id = result.scalar()
+  return new_comment_id
+  
+def save_reply(parent_id, child_id):
+  reply_query = text("""
+    INSERT INTO Reply (parent_id, child_id)
+    VALUES (:parent_id, :child_id)
+  """)
+  g.conn.execute(reply_query, {"parent_id": parent_id, "child_id": child_id})
+  
+def user_like_comment(user_email, comment_id):
+  query = text("""
+    INSERT INTO user_comment_like (email, comment_id, isLike)
+    VALUES (:email, :comment_id, TRUE)
+    ON CONFLICT (email, comment_id)
+    DO UPDATE SET isLike = TRUE
+  """)
+  g.conn.execute(query, {"email": user_email, "comment_id": comment_id})
+  g.conn.commit()
+  
+
+def user_dislike_comment(user_email, comment_id):
+  query = text("""
+    INSERT INTO user_comment_like (email, comment_id, isLike)
+    VALUES (:email, :comment_id, FALSE)
+    ON CONFLICT (email, comment_id)
+    DO UPDATE SET isLike = FALSE
+  """)
+  g.conn.execute(query, {"email": user_email, "comment_id": comment_id})
+  g.conn.commit()

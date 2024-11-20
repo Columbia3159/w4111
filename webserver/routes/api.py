@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify, g, render_template, session
-from sqlalchemy import text
 from app_routes import Routes
 from db import *
 
@@ -50,3 +49,66 @@ def delete_rating(player_id):
   except Exception as e:
     print(e)
     return {"error": "An error occurred while deleting ratings"}, 500
+  
+@api_bp.route('/comment', methods=['POST'])
+def submit_comment():
+  try:
+    data = request.get_json()
+    player_id = data.get('player_id')
+    comment = data.get('comment') 
+    user = "khaliun0122@gmail.com"#session.get("user_email", None)
+    
+    if user is None:
+      return {"error": "User not logged in"}, 401
+
+    save_comment(player_id, user, comment)
+    g.conn.commit()
+
+    return {"message": "Comment saved successfully"}, 200
+  except Exception as e:
+    return {"error": "An error occurred while saving comment"}, 500
+  
+@api_bp.route('/comment/like/<int:comment_id>', methods=['POST'])
+def like_comment(comment_id):
+  user_email = "khaliun0122@gmail.com"#session.get("user_email", None)
+  if not user_email:
+    return {"error": "User not logged in."}, 401
+  try:
+    user_like_comment(user_email, comment_id)
+    return {"message": "Liked successfully."}, 200
+  except Exception as e:
+    print(e)
+    return {"error": "An error occurred while processing your request."}, 500
+
+@api_bp.route('/comment/dislike/<int:comment_id>', methods=['POST'])
+def dislike_comment(comment_id):
+  user_email = "khaliun0122@gmail.com"#session.get("user_email", None)
+  if not user_email:
+    return {"error": "User not logged in."}, 401
+  try:
+    user_dislike_comment(user_email, comment_id)
+    return {"message": "Disliked successfully."}, 200
+  except Exception as e:
+    print(e)
+    return {"error": "An error occurred while processing your request."}, 500
+  
+@api_bp.route('/comment/reply', methods=['POST'])
+def add_reply():
+  data = request.get_json()
+  parent_id = data.get('parent_id')
+  player_id = data.get('player_id')
+  reply_text = data.get('reply')
+  user_email = "khaliun0122@gmail.com"#session.get("user_email", None)
+
+  if not parent_id or not reply_text or not user_email:
+    return {"error": "Invalid input."}, 400
+
+  try:
+    new_comment_id = save_comment(player_id, user_email, reply_text)
+    save_reply(parent_id, new_comment_id)
+    g.conn.commit()
+
+    return {"message": "Reply added successfully."}, 200
+  except Exception as e:
+    print(e)
+    return {"error": "An error occurred while adding the reply."}, 500

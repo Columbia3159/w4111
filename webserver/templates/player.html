@@ -77,7 +77,8 @@
     {% include "player_components/teams.html" %} {% include
     "player_components/average.html" %} {% if session.get("user_email", None) !=
     None and session.get("user_name", None) != None%} {% include
-    "player_components/rate.html" %} {% endif %}
+    "player_components/rate.html" %} {% endif %}{% include
+    "player_components/comment.html" %}
   </div>
 </div>
 {% endblock %}
