@@ -16,16 +16,3 @@ npx tailwindcss -i ./static/css/style.css -o ./static/css/output.css --watch
 ```
 # Production
 ### [Production url](http://34.139.229.63:8111/)
-## Start server
-```
-nohup python3 server.py > flask.log 2>&1 &
-```
-## Check log
-```
-tail -f flask.log
-```
-## Stop server
-```
-ps aux | grep server.py
-kill <PID>
-```
